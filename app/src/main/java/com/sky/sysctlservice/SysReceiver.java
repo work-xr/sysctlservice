@@ -264,7 +264,6 @@ public class SysReceiver extends BroadcastReceiver {
 
                 if (mCallbackStatus == PackageInstaller.STATUS_SUCCESS) {
                     Log.d(TAG, "onReceive: install success");
-                    context.unregisterReceiver(this);
                 } else if (mCallbackStatus == PackageInstaller.STATUS_PENDING_USER_ACTION) {
                     Log.d(TAG, "onReceive: install failed pending -1");
                 }
@@ -272,9 +271,12 @@ public class SysReceiver extends BroadcastReceiver {
                 {
                     Log.d(TAG, "onReceive: install failed status = " + mCallbackStatus);
                 }
+                context.unregisterReceiver(this);
                 Intent i = new Intent(ACTION_INSTALL_STATUS);
+                i.addFlags(0x01000000);
+                i.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
                 i.putExtra("status", mCallbackStatus);
-                context.sendBroadcast(intent);
+                context.sendBroadcast(i);
 
                 mPackageInstallerTimeoutLock.notify();
             }
